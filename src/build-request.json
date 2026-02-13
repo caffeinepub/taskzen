@@ -1,133 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Add completed-task deletion, task reminders, Study Zone (subjects/assignments), and Focus Mode notifications",
+  "title": "Add delete option for every Work Zone item and every Study Zone assignment",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-15",
-      "text": "Add backend support for deleting tasks, with permissions enforced so a user can delete only their own tasks (admins may delete any task).",
+      "id": "REQ-37",
+      "text": "Add a delete control for each Work Zone project item so users can delete any item (completed or not) from the selected project.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "i work/study zone give delete option in every task"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On the Work Zone page, each project item row includes a visible delete (trash) button.",
+        "Clicking delete removes that item from the current project's items list immediately without affecting other items.",
+        "Delete works for both completed and active items.",
+        "The delete button has an accessible label/title (English), e.g., \"Delete task\"."
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "text": "Implement backend support to delete any Study Zone assignment (not only completed ones) with proper per-user authorization, and ensure the assignment is removed from its subject’s assignments list.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-3"
         ],
         "quotes": [
-          "plz add delete option after task complete"
+          "i work/study zone give delete option in every task"
         ]
       },
       "acceptanceCriteria": [
-        "A new backend method exists to delete a task by id.",
-        "If the task does not exist, the method returns an error (trap) with a clear message.",
-        "If the caller is not the task owner and not an admin, the method traps with an unauthorized error.",
-        "After deletion, the task no longer appears in getAllTasks results for the owner/admin."
+        "A new backend method exists to delete an assignment regardless of completion status (e.g., by subjectId + assignmentId, or by assignmentId with a lookup), and it enforces: only the assignment owner (or admin) can delete it.",
+        "After deletion, the assignment no longer appears in getAssignments(subjectId) results.",
+        "If the assignment was created with an underlying Task (taskId), that underlying task is also deleted so it does not remain in the user task list.",
+        "Unauthorized deletion attempts trap with an \"Unauthorized\" message consistent with existing patterns.",
+        "Implementation stays within the existing single-actor backend/main.mo file."
       ]
     },
     {
-      "id": "REQ-16",
-      "text": "Add a delete option in the Tasks UI for completed tasks so users can remove completed tasks from their list.",
+      "id": "REQ-39",
+      "text": "Update the Study Zone frontend to show a delete control for every assignment row (completed or not) and wire it to the new backend assignment delete method using React Query, with appropriate loading/disabled states and an English success/error toast.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-3"
         ],
         "quotes": [
-          "plz add delete option after task complete"
+          "i work/study zone give delete option in every task"
         ]
       },
       "acceptanceCriteria": [
-        "Each completed task row in the Completed section displays a visible delete control (button/icon) with an accessible label (e.g., \"Delete task\").",
-        "Deleting a completed task removes it from the UI after the backend call succeeds and the tasks query is refreshed/invalidated.",
-        "While deletion is in progress, the delete control is disabled and the UI communicates loading state.",
-        "Errors show a user-friendly toast/error message in English."
-      ]
-    },
-    {
-      "id": "REQ-17",
-      "text": "Implement a task reminder feature that lets a user set/clear an optional reminder time for a task and persists it in the backend.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "get remider option to reminder user"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend task data supports an optional reminder time field per task and exposes methods to set/update/clear the reminder for a task id with owner/admin permission checks.",
-        "Frontend provides a way to set a reminder time for a task (at minimum from the Tasks page for an active task) and to clear an existing reminder.",
-        "Reminder changes persist after refresh (re-fetching tasks shows the saved reminder state).",
-        "If a user tries to set a reminder for a task they do not own (and is not admin), the backend denies it."
-      ]
-    },
-    {
-      "id": "REQ-18",
-      "text": "When a reminder becomes due while the app is open, notify the user in-app and (when permitted) via the browser Notifications API; provide a clear UI prompt/flow to request notification permission.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "get remider option to reminder user"
-        ]
-      },
-      "acceptanceCriteria": [
-        "If Notification permission is not granted, the app provides a clear UI control to request permission (English copy).",
-        "When a task reminder is due and the app is open, the user receives an in-app notification (e.g., toast) containing the task title.",
-        "When Notification permission is granted, the app also triggers a browser notification for due reminders while the app is open.",
-        "The reminder notification is triggered only once per due event (no repeated spamming from re-renders)."
-      ]
-    },
-    {
-      "id": "REQ-19",
-      "text": "Add a Study Zone module where users can create subjects and add assignments under each subject; persist all Study Zone data in the backend with per-user access control.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "add diifernt study zone to add subject and add their assignment"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend exposes CRUD-style methods to: create/list subjects; create/list assignments for a subject; and (at minimum) mark an assignment completed or delete it, with owner/admin permission checks.",
-        "Frontend adds new routed pages for Study Zone (at minimum: Subjects list page, Subject detail page showing assignments, and forms to add a subject and add an assignment).",
-        "Study Zone pages are accessible from the app navigation (header) and use consistent styling with the existing TaskZen UI.",
-        "Subjects and assignments are scoped to the authenticated user (another user cannot view or mutate them)."
-      ]
-    },
-    {
-      "id": "REQ-20",
-      "text": "Add a Focus Mode page with a toggle that enables notification behavior while Focus Mode is active (i.e., reminders should prefer browser notifications when permission is granted) and presents a distraction-minimized UI.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "add focus mode in focus mode enable notification"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A new Focus Mode route/page exists and is reachable from the app navigation.",
-        "The Focus Mode page includes a clear on/off control to enable/disable Focus Mode.",
-        "When Focus Mode is enabled and Notification permission is granted, due reminders trigger browser notifications (in addition to any in-app indication).",
-        "The Focus Mode page uses a visibly simplified/distraction-minimized layout (e.g., fewer controls, calmer presentation) without changing existing task functionality."
+        "In StudySubjectDetailPage, every assignment row shows a delete (trash) button (not limited to completed assignments).",
+        "Clicking delete removes the assignment after the mutation succeeds and the assignments list refreshes (React Query invalidation/refetch).",
+        "While delete is pending for an item, its delete button is disabled and shows a loading indicator consistent with existing UI patterns.",
+        "On success, an English toast confirms deletion; on error, an English toast displays a meaningful message (e.g., permission denied, not found).",
+        "No edits are made to any frontend immutablePaths files listed in SYSTEM_CONTEXT."
       ]
     }
   ],
   "constraints": [
-    "Respect the single-actor backend architecture: all Motoko logic must remain in backend/main.mo; add backend/migration.mo only if an upgrade-safe state migration is actually required.",
-    "Do not edit files under frontend/src/components/ui (read-only shadcn components); compose them instead.",
-    "Do not edit immutable hook entrypoints listed in SYSTEM_CONTEXT (frontend/src/hooks/useInternetIdentity.ts / .tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
-    "Use English for any new user-facing UI text."
+    "Backend must remain a single-actor Motoko architecture with all logic in backend/main.mo; only add backend/migration.mo if an actual state migration is required.",
+    "Do not edit files under frontend immutablePaths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
+    "Use English for any user-facing text introduced or modified by this change."
   ],
   "nonGoals": [
-    "Implementing true push notifications when the app is closed (no service-worker push or external messaging providers).",
-    "Integrating third-party notification services (email/SMS/push providers) or external databases.",
-    "Adding real-time features (WebSockets) or multi-canister backend architecture."
+    "Do not add persistence or backend storage for Work Zone projects/items as part of this request (Work Zone deletion can remain local UI state).",
+    "Do not change deletion behavior on the main Tasks page beyond what is needed to keep Study Zone assignment deletion consistent (e.g., do not introduce new task delete rules).",
+    "Do not add new Study Zone features beyond enabling deletion for all assignments (e.g., no archiving, undo, bulk delete, or filtering)."
   ],
   "imageRequirements": {
     "required": [],

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Focus, Bell, Info } from 'lucide-react';
 import ProfileSetup from '../components/auth/ProfileSetup';
+import FocusModeTimer from '../components/focus/FocusModeTimer';
 
 export default function FocusModePage() {
   const { identity } = useInternetIdentity();
@@ -57,6 +58,25 @@ export default function FocusModePage() {
               </CardContent>
             </Card>
 
+            {/* Timer - Only visible when Focus Mode is enabled */}
+            {isFocusModeEnabled ? (
+              <FocusModeTimer />
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="py-12 text-center">
+                  <div className="w-16 h-16 rounded-full bg-muted mx-auto flex items-center justify-center mb-4">
+                    <Focus className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground mb-2 font-medium">
+                    Timer Available in Focus Mode
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Enable Focus Mode above to access the focus timer
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Notification Status */}
             {isFocusModeEnabled && (
               <Alert className={notificationPermission === 'granted' ? 'border-primary/20 bg-primary/5' : ''}>
@@ -84,6 +104,9 @@ export default function FocusModePage() {
               <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p>
                   <strong className="text-foreground">Enhanced Notifications:</strong> When Focus Mode is enabled and you've granted notification permission, you'll receive browser notifications for task reminders even when TaskZen is in the background.
+                </p>
+                <p>
+                  <strong className="text-foreground">Focus Timer:</strong> Use the built-in timer to track your focus sessions and maintain deep work periods with mindful time management.
                 </p>
                 <p>
                   <strong className="text-foreground">Stay on Track:</strong> Browser notifications help ensure you never miss an important task deadline, keeping you focused and productive.

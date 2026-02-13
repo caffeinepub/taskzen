@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
 import RequireAuth from '../components/auth/RequireAuth';
-import { useGetSubjects, useGetAssignments, useAddAssignment } from '../hooks/useStudyZone';
-import { useGetAllTasks, useCompleteTask, useDeleteTask } from '../hooks/useTasks';
+import { useGetSubjects, useGetAssignments, useAddAssignment, useDeleteAssignment } from '../hooks/useStudyZone';
+import { useGetAllTasks, useCompleteTask } from '../hooks/useTasks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Plus, Loader2, AlertCircle, BookOpen, Trash2, CheckCircle2 } from 'lucide-react';
-import { formatReminderTime, dateToNanos, validateReminderInput } from '../lib/reminders';
+import { formatReminderTime, dateToNanos } from '../lib/reminders';
 
 export default function StudySubjectDetailPage() {
   const { subjectId } = useParams({ from: '/app-layout/study/$subjectId' });
@@ -21,10 +21,11 @@ export default function StudySubjectDetailPage() {
   const { data: tasks } = useGetAllTasks();
   const addAssignment = useAddAssignment();
   const completeTask = useCompleteTask();
-  const deleteTask = useDeleteTask();
+  const deleteAssignment = useDeleteAssignment();
   
   const [newAssignmentTitle, setNewAssignmentTitle] = useState('');
   const [newAssignmentDueDate, setNewAssignmentDueDate] = useState('');
+  const [deletingAssignmentId, setDeletingAssignmentId] = useState<bigint | null>(null);
 
   const subject = subjects?.find(s => s.id === subjectIdBigInt);
 
@@ -52,8 +53,16 @@ export default function StudySubjectDetailPage() {
     completeTask.mutate(taskId);
   };
 
-  const handleDeleteAssignment = (taskId: bigint) => {
-    deleteTask.mutate(taskId);
+  const handleDeleteAssignment = (assignmentId: bigint) => {
+    setDeletingAssignmentId(assignmentId);
+    deleteAssignment.mutate(
+      { subjectId: subjectIdBigInt, assignmentId },
+      {
+        onSettled: () => {
+          setDeletingAssignmentId(null);
+        },
+      }
+    );
   };
 
   const getTaskForAssignment = (taskId: bigint) => {
@@ -130,95 +139,100 @@ export default function StudySubjectDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Error State */}
+            {/* Assignments List */}
+            {isLoading && (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+                  <p className="text-muted-foreground mt-4">Loading assignments...</p>
+                </CardContent>
+              </Card>
+            )}
+
             {isError && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>
-                  {error instanceof Error ? error.message : 'Failed to load assignments. Please try again.'}
+                  {error?.message || 'Failed to load assignments. Please try again.'}
                 </AlertDescription>
               </Alert>
             )}
 
-            {/* Loading State */}
-            {isLoading && (
-              <div className="flex items-center justify-center py-16">
-                <div className="text-center space-y-4">
-                  <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-                  <p className="text-muted-foreground">Loading assignments...</p>
-                </div>
-              </div>
-            )}
-
-            {/* Assignments List */}
-            {!isLoading && !isError && assignments && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-foreground">Assignments</h2>
-                {assignments.length === 0 ? (
-                  <Card className="border-dashed">
-                    <CardContent className="py-16">
-                      <div className="text-center space-y-2">
-                        <h3 className="text-lg font-semibold text-foreground">No assignments yet</h3>
-                        <p className="text-muted-foreground">
-                          Add your first assignment to get started.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="space-y-2">
+            {!isLoading && !isError && assignments && assignments.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Assignments</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
                     {assignments.map((assignment) => {
                       const task = getTaskForAssignment(assignment.taskId);
                       const isCompleted = task?.isCompleted || false;
-                      
+                      const isDeleting = deletingAssignmentId === assignment.id;
+
                       return (
-                        <Card 
+                        <div
                           key={assignment.id.toString()}
-                          className={isCompleted ? 'bg-muted/50 border-muted' : ''}
+                          className="flex items-start gap-3 p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
                         >
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-4">
-                              <Checkbox
-                                checked={isCompleted}
-                                onCheckedChange={() => !isCompleted && handleCompleteAssignment(assignment.taskId)}
-                                disabled={completeTask.isPending || isCompleted}
-                                className="w-5 h-5 mt-0.5"
-                              />
-                              <div className="flex-1 space-y-1">
-                                <p className={`font-medium ${isCompleted ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                                  {assignment.title}
-                                </p>
-                                {assignment.dueDate && (
-                                  <p className="text-sm text-muted-foreground">
-                                    Due: {formatReminderTime(assignment.dueDate)}
-                                  </p>
-                                )}
-                              </div>
-                              {isCompleted && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDeleteAssignment(assignment.taskId)}
-                                  disabled={deleteTask.isPending}
-                                  className="h-8 w-8 p-0"
-                                  aria-label="Delete assignment"
-                                >
-                                  {deleteTask.isPending ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                  ) : (
-                                    <Trash2 className="w-4 h-4 text-destructive" />
-                                  )}
-                                </Button>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
+                          <Checkbox
+                            checked={isCompleted}
+                            onCheckedChange={() => handleCompleteAssignment(assignment.taskId)}
+                            disabled={isCompleted || completeTask.isPending}
+                            className="mt-1"
+                            aria-label={isCompleted ? 'Assignment completed' : 'Mark assignment as complete'}
+                          />
+                          
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className={`font-medium ${
+                                isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'
+                              }`}
+                            >
+                              {assignment.title}
+                            </p>
+                            {assignment.dueDate && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Due: {formatReminderTime(assignment.dueDate)}
+                              </p>
+                            )}
+                          </div>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteAssignment(assignment.id)}
+                            disabled={isDeleting}
+                            aria-label="Delete assignment"
+                            title="Delete assignment"
+                            className="flex-shrink-0 text-muted-foreground hover:text-destructive"
+                          >
+                            {isDeleting ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
                       );
                     })}
                   </div>
-                )}
-              </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {!isLoading && !isError && assignments && assignments.length === 0 && (
+              <Card className="border-dashed">
+                <CardContent className="py-12 text-center">
+                  <div className="w-16 h-16 rounded-full bg-muted mx-auto flex items-center justify-center mb-4">
+                    <BookOpen className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground">
+                    No assignments yet. Add your first assignment to get started.
+                  </p>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>

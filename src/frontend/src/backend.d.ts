@@ -42,17 +42,22 @@ export interface backendInterface {
     addTask(title: string): Promise<bigint>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     clearTaskReminder(taskId: bigint): Promise<void>;
-    completeAssignment(taskId: bigint): Promise<void>;
     completeTask(id: bigint): Promise<void>;
     createSubject(title: string): Promise<bigint>;
+    deleteAssignment(subjectId: bigint, assignmentId: bigint): Promise<void>;
+    deleteSubject(subjectId: bigint): Promise<void>;
     deleteTask(id: bigint): Promise<void>;
     getAllTasks(): Promise<Array<Task>>;
     getAssignments(subjectId: bigint): Promise<Array<Assignment> | null>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getDailyGoal(user: Principal): Promise<bigint | null>;
+    getProgressPercentage(user: Principal): Promise<bigint>;
     getSubjects(): Promise<Array<StudySubject>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    getUserProgress(user: Principal): Promise<bigint>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    setDailyGoal(goal: bigint): Promise<void>;
     setTaskReminder(taskId: bigint, reminderTime: Time): Promise<void>;
 }

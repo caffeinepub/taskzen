@@ -73,3 +73,55 @@
         text-wrap: balance;
     }
 }
+
+/* Print styles for Daily Report */
+@media print {
+    /* Hide everything except the report content */
+    body * {
+        visibility: hidden;
+    }
+    
+    .print-content,
+    .print-content * {
+        visibility: visible;
+    }
+    
+    .print-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    
+    /* Hide non-print elements */
+    .no-print {
+        display: none !important;
+    }
+    
+    /* Optimize for print */
+    .report-content {
+        background: white;
+        color: black;
+        padding: 2rem;
+    }
+    
+    .print-header {
+        margin-bottom: 2rem;
+    }
+    
+    .print-footer {
+        margin-top: 2rem;
+        page-break-after: avoid;
+    }
+    
+    /* Ensure cards print nicely */
+    .report-content > * {
+        page-break-inside: avoid;
+    }
+    
+    /* Remove shadows and borders for cleaner print */
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+}

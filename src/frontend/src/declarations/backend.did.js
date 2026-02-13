@@ -47,9 +47,10 @@ export const idlService = IDL.Service({
   'addTask' : IDL.Func([IDL.Text], [IDL.Nat], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'clearTaskReminder' : IDL.Func([IDL.Nat], [], []),
-  'completeAssignment' : IDL.Func([IDL.Nat], [], []),
   'completeTask' : IDL.Func([IDL.Nat], [], []),
   'createSubject' : IDL.Func([IDL.Text], [IDL.Nat], []),
+  'deleteAssignment' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
+  'deleteSubject' : IDL.Func([IDL.Nat], [], []),
   'deleteTask' : IDL.Func([IDL.Nat], [], []),
   'getAllTasks' : IDL.Func([], [IDL.Vec(Task)], ['query']),
   'getAssignments' : IDL.Func(
@@ -59,14 +60,18 @@ export const idlService = IDL.Service({
     ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getDailyGoal' : IDL.Func([IDL.Principal], [IDL.Opt(IDL.Nat)], ['query']),
+  'getProgressPercentage' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
   'getSubjects' : IDL.Func([], [IDL.Vec(StudySubject)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'getUserProgress' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'setDailyGoal' : IDL.Func([IDL.Nat], [], []),
   'setTaskReminder' : IDL.Func([IDL.Nat, Time], [], []),
 });
 
@@ -112,9 +117,10 @@ export const idlFactory = ({ IDL }) => {
     'addTask' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'clearTaskReminder' : IDL.Func([IDL.Nat], [], []),
-    'completeAssignment' : IDL.Func([IDL.Nat], [], []),
     'completeTask' : IDL.Func([IDL.Nat], [], []),
     'createSubject' : IDL.Func([IDL.Text], [IDL.Nat], []),
+    'deleteAssignment' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
+    'deleteSubject' : IDL.Func([IDL.Nat], [], []),
     'deleteTask' : IDL.Func([IDL.Nat], [], []),
     'getAllTasks' : IDL.Func([], [IDL.Vec(Task)], ['query']),
     'getAssignments' : IDL.Func(
@@ -124,14 +130,18 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getDailyGoal' : IDL.Func([IDL.Principal], [IDL.Opt(IDL.Nat)], ['query']),
+    'getProgressPercentage' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
     'getSubjects' : IDL.Func([], [IDL.Vec(StudySubject)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'getUserProgress' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'setDailyGoal' : IDL.Func([IDL.Nat], [], []),
     'setTaskReminder' : IDL.Func([IDL.Nat, Time], [], []),
   });
 };

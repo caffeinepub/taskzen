@@ -125,18 +125,23 @@ export interface backendInterface {
     addTask(title: string): Promise<bigint>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     clearTaskReminder(taskId: bigint): Promise<void>;
-    completeAssignment(taskId: bigint): Promise<void>;
     completeTask(id: bigint): Promise<void>;
     createSubject(title: string): Promise<bigint>;
+    deleteAssignment(subjectId: bigint, assignmentId: bigint): Promise<void>;
+    deleteSubject(subjectId: bigint): Promise<void>;
     deleteTask(id: bigint): Promise<void>;
     getAllTasks(): Promise<Array<Task>>;
     getAssignments(subjectId: bigint): Promise<Array<Assignment> | null>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getDailyGoal(user: Principal): Promise<bigint | null>;
+    getProgressPercentage(user: Principal): Promise<bigint>;
     getSubjects(): Promise<Array<StudySubject>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    getUserProgress(user: Principal): Promise<bigint>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    setDailyGoal(goal: bigint): Promise<void>;
     setTaskReminder(taskId: bigint, reminderTime: Time): Promise<void>;
 }
 import type { Assignment as _Assignment, StudySubject as _StudySubject, Task as _Task, Time as _Time, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
@@ -212,20 +217,6 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async completeAssignment(arg0: bigint): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.completeAssignment(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.completeAssignment(arg0);
-            return result;
-        }
-    }
     async completeTask(arg0: bigint): Promise<void> {
         if (this.processError) {
             try {
@@ -251,6 +242,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.createSubject(arg0);
+            return result;
+        }
+    }
+    async deleteAssignment(arg0: bigint, arg1: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteAssignment(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteAssignment(arg0, arg1);
+            return result;
+        }
+    }
+    async deleteSubject(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteSubject(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteSubject(arg0);
             return result;
         }
     }
@@ -324,6 +343,34 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n14(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getDailyGoal(arg0: Principal): Promise<bigint | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getDailyGoal(arg0);
+                return from_candid_opt_n2(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getDailyGoal(arg0);
+            return from_candid_opt_n2(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getProgressPercentage(arg0: Principal): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getProgressPercentage(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getProgressPercentage(arg0);
+            return result;
+        }
+    }
     async getSubjects(): Promise<Array<StudySubject>> {
         if (this.processError) {
             try {
@@ -352,6 +399,20 @@ export class Backend implements backendInterface {
             return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getUserProgress(arg0: Principal): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getUserProgress(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getUserProgress(arg0);
+            return result;
+        }
+    }
     async isCallerAdmin(): Promise<boolean> {
         if (this.processError) {
             try {
@@ -377,6 +438,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.saveCallerUserProfile(arg0);
+            return result;
+        }
+    }
+    async setDailyGoal(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.setDailyGoal(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.setDailyGoal(arg0);
             return result;
         }
     }

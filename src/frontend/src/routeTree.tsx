@@ -4,9 +4,12 @@ import AppLayout from './components/layout/AppLayout';
 import TaskZenLanding from './pages/TaskZenLanding';
 import TasksPage from './pages/TasksPage';
 import AddTaskPage from './pages/AddTaskPage';
+import DashboardPage from './pages/DashboardPage';
 import StudySubjectsPage from './pages/StudySubjectsPage';
 import StudySubjectDetailPage from './pages/StudySubjectDetailPage';
 import FocusModePage from './pages/FocusModePage';
+import WorkZonePage from './pages/WorkZonePage';
+import SupportPage from './pages/SupportPage';
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -24,6 +27,12 @@ const appLayoutRoute = createRoute({
   component: AppLayout,
 });
 
+const dashboardRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/dashboard',
+  component: DashboardPage,
+});
+
 const tasksRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/tasks',
@@ -34,6 +43,12 @@ const addTaskRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/tasks/add',
   component: AddTaskPage,
+});
+
+const workRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/work',
+  component: WorkZonePage,
 });
 
 const studyRoute = createRoute({
@@ -54,14 +69,23 @@ const focusModeRoute = createRoute({
   component: FocusModePage,
 });
 
+const supportRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/support',
+  component: SupportPage,
+});
+
 export const routeTree = rootRoute.addChildren([
   landingRoute,
   appLayoutRoute.addChildren([
+    dashboardRoute,
     tasksRoute, 
-    addTaskRoute, 
+    addTaskRoute,
+    workRoute,
     studyRoute, 
     studySubjectDetailRoute,
     focusModeRoute,
+    supportRoute,
   ]),
 ]);
 

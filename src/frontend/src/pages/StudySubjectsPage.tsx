@@ -3,6 +3,7 @@ import RequireAuth from '../components/auth/RequireAuth';
 import { useGetSubjects, useCreateSubject } from '../hooks/useStudyZone';
 import { useGetCallerUserProfile } from '../hooks/useTasks';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { useActor } from '../hooks/useActor';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,10 +15,12 @@ import ProfileSetup from '../components/auth/ProfileSetup';
 
 export default function StudySubjectsPage() {
   const { identity } = useInternetIdentity();
+  const { actor, isFetching: actorFetching } = useActor();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
   const { data: subjects, isLoading, isError, error } = useGetSubjects();
   const createSubject = useCreateSubject();
   const [newSubjectTitle, setNewSubjectTitle] = useState('');
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const isAuthenticated = !!identity;
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
@@ -25,10 +28,34 @@ export default function StudySubjectsPage() {
   const handleCreateSubject = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSubjectTitle.trim()) return;
+    
+    // Clear any previous error
+    setCreateError(null);
+    
+    // Check if actor is ready
+    if (!actor || actorFetching) {
+      setCreateError('Please wait while connecting...');
+      return;
+    }
 
     createSubject.mutate(newSubjectTitle, {
       onSuccess: () => {
         setNewSubjectTitle('');
+        setCreateError(null);
+      },
+      onError: (error: any) => {
+        // Set inline error in addition to toast
+        let errorMessage = 'Failed to create subject. Please try again.';
+        if (error?.message) {
+          if (error.message.includes('Unauthorized')) {
+            errorMessage = 'You must be logged in to create subjects.';
+          } else if (error.message.includes('trap')) {
+            errorMessage = 'Authorization error. Please log in again.';
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        setCreateError(errorMessage);
       },
     });
   };
@@ -63,18 +90,32 @@ export default function StudySubjectsPage() {
                       placeholder="e.g., Mathematics, Physics, History..."
                       value={newSubjectTitle}
                       onChange={(e) => setNewSubjectTitle(e.target.value)}
-                      disabled={createSubject.isPending}
+                      disabled={createSubject.isPending || !actor || actorFetching}
                     />
                   </div>
+                  
+                  {/* Inline error display */}
+                  {createError && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{createError}</AlertDescription>
+                    </Alert>
+                  )}
+                  
                   <Button 
                     type="submit" 
-                    disabled={createSubject.isPending || !newSubjectTitle.trim()}
+                    disabled={createSubject.isPending || !newSubjectTitle.trim() || !actor || actorFetching}
                     className="w-full gap-2"
                   >
                     {createSubject.isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
                         Creating...
+                      </>
+                    ) : actorFetching ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Connecting...
                       </>
                     ) : (
                       <>

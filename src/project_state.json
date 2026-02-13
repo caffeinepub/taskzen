@@ -1,17 +1,23 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
-  "summary": "Expand TaskZen beyond basic task CRUD into additional productivity modules: task deletion after completion, reminder/notifications, a Study Zone for subjects/assignments, and a Focus Mode that can enable notifications.",
+  "projectStateVersion": 19,
+  "summary": "Expand TaskZen with a productivity dashboard plus Work Zone and Study Zone modules and a Focus Mode timer, helping users manage tasks, projects/priority/progress, study subjects/assignments/goals, set daily goals, track completion percentage, and generate daily reports (PDF). Email-based delivery of reports is currently constrained by account limitations.",
   "architectural_notes": [
     "Visual style: minimal, calm/devotional; soft saffron/white/cream palette; rounded cards; soft shadows; modern clean typography; clutter-free layout.",
     "Move from single-page landing architecture to multi-page routing/navigation with separate views.",
     "Add task creation flow (form + validation) and persistent task state (local storage or backend TBD).",
     "Provide the task-completed animation as a framework-agnostic vanilla HTML/CSS/JS widget (no external libs) with an exported function/hook to trigger it from the app’s task-completed event.",
-    "Store the 100 Hindi inspirational quotes in a JS array exactly as provided; randomly select one per completion; show in centered popup with fade-in; auto-hide after 4 seconds.",
-    "Product scope now includes reminders/notifications and additional modules (Study Zone with subjects/assignments; Focus Mode notification behavior), beyond basic task list/add flows."
+    "Product scope now includes reminders/notifications and additional modules (Study Zone with subjects/assignments; Focus Mode notification behavior), beyond basic task list/add flows.",
+    "Email sending/features are disabled for the current account; email-based report delivery is blocked unless the account is upgraded.",
+    "Work Zone should support project organization, priority management, and progress tracking.",
+    "Focus Mode should include a dedicated timer feature available only while Focus Mode is active.",
+    "Task-completed quote/message popup should remain visible for ~60 seconds and include a close (X) button to dismiss immediately.",
+    "Customer support should be implemented as an in-app Support/Help section that displays a support email address only; do not implement email sending due to current account limitations."
   ],
   "known_issues": [
-    "User reports inability to add tasks and that everything is on a single page; expects multi-page app behavior."
+    "User reports inability to add tasks and that everything is on a single page; expects multi-page app behavior.",
+    "Home page options/modules are not all clickable as expected (user request: make all options clickable on Home).",
+    "Study Zone: user cannot add/create subjects (subject creation flow is broken)."
   ],
   "isFixRequest": false,
   "existing_features": [
@@ -158,6 +164,142 @@
         "REQ-20"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-new-authenticated-productivity-dashboard-page-where-the-user-can-a-see-overall-productivity-stats-total-tasks-completed-tasks-active-tasks-completion-percentage-and-b-view-manage-all-tasks-from-the-same-page-reuse-existing-task-list-interactions-complete-delete-completed-tasks-reminders",
+      "title": "Add a new authenticated Productivity Dashboard page where the user can (a) see overall productivity stats (total tasks, completed tasks, active tasks, completion percentage) and (b) view/manage all tasks from the same page (reuse existing task list interactions: complete, delete completed tasks, reminders).",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-navigation-access-to-the-new-dashboard-from-the-main-authenticated-app-navigation-header-without-removing-existing-routes-home-tasks-add-task-study-zone-focus-mode",
+      "title": "Add navigation access to the new Dashboard from the main authenticated app navigation (header) without removing existing routes (Home, Tasks, Add Task, Study Zone, Focus Mode).",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-daily-goal-setting-on-the-dashboard-so-a-user-can-set-update-a-daily-task-completion-target-e-g-target-10-tasks-and-see-progress-e-g-5-of-10-and-percentage-completion-toward-that-goal",
+      "title": "Implement daily goal-setting on the dashboard so a user can set/update a daily task completion target (e.g., target = 10 tasks) and see progress (e.g., 5 of 10) and percentage completion toward that goal.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-daily-report-feature-accessible-from-the-dashboard-that-generates-a-report-view-summarizing-the-user-s-productivity-stats-goal-progress-a-list-summary-of-tasks-for-the-current-day-and-allows-the-user-to-download-save-it-as-a-pdf-local-download-only-no-email",
+      "title": "Add a Daily Report feature accessible from the dashboard that generates a report view summarizing the user’s productivity (stats + goal progress + a list summary of tasks) for the current day and allows the user to download/save it as a PDF (local download only; no email).",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-new-dashboard-report-features-do-not-implement-sending-emails-or-scheduling-daily-email-delivery-explicitly-omit-email-delivery-due-to-current-account-limitations",
+      "title": "Ensure the new dashboard/report features do not implement sending emails or scheduling daily email delivery (explicitly omit email delivery due to current account limitations).",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-landing-page-feature-copy-for-work-zone-and-study-zone-to-match-the-user-provided-text-exactly-including-the-bullet-items-so-the-landing-page-clearly-communicates-work-zone-organize-professional-tasks-with-clarity-create-projects-set-priorities-and-track-progress-all-within-a-peaceful-distraction-free-environment-with-bullets-project-organization-priority-management-progress-tracking-study-zone-dedicate-yourself-to-learning-with-focused-study-sessions-track-subjects-assignments-and-goals-with-the-devotion-they-deserve-with-bullets-subject-organization-assignment-tracking-learning-goals",
+      "title": "Update the landing page feature copy for “Work Zone” and “Study Zone” to match the user-provided text exactly (including the bullet items), so the landing page clearly communicates: Work Zone: “Organize professional tasks with clarity. Create projects, set priorities, and track progress—all within a peaceful, distraction-free environment.” with bullets “Project organization”, “Priority management”, “Progress tracking”; Study Zone: “Dedicate yourself to learning with focused study sessions. Track subjects, assignments, and goals with the devotion they deserve.” with bullets “Subject organization”, “Assignment tracking”, “Learning goals”.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-authenticated-work-zone-area-to-the-app-as-a-dedicated-page-reachable-via-client-side-routing-and-the-main-authenticated-header-navigation-providing-ui-for-1-project-organization-2-priority-management-and-3-progress-tracking-in-a-peaceful-distraction-minimized-layout-consistent-with-the-existing-app-styling",
+      "title": "Add an authenticated “Work Zone” area to the app as a dedicated page reachable via client-side routing and the main authenticated header navigation, providing UI for: (1) project organization, (2) priority management, and (3) progress tracking, in a peaceful, distraction-minimized layout consistent with the existing app styling.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-focus-mode-timer-that-is-only-available-within-focus-mode-implement-a-timer-ui-on-the-existing-focus-mode-page-and-ensure-it-is-not-shown-anywhere-else-in-the-app-the-timer-must-only-be-usable-visible-when-focus-mode-is-enabled-on-that-page",
+      "title": "Add a Focus Mode timer that is only available within Focus Mode: implement a timer UI on the existing Focus Mode page and ensure it is not shown anywhere else in the app. The timer must only be usable/visible when Focus Mode is enabled on that page.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-all-feature-options-on-the-home-landing-page-clickable-so-each-card-behaves-as-an-interactive-navigation-element-and-routes-the-user-into-the-corresponding-in-app-page",
+      "title": "Make all feature options on the Home (landing) page clickable so each card behaves as an interactive navigation element and routes the user into the corresponding in-app page.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-in-app-task-completed-flash-message-quote-popup-so-it-stays-visible-for-1-minute-after-a-task-is-completed",
+      "title": "Update the in-app task-completed flash message (quote popup) so it stays visible for 1 minute after a task is completed.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-close-x-button-to-the-task-completed-flash-message-so-the-user-can-dismiss-it-immediately",
+      "title": "Add a close (X) button to the task-completed flash message so the user can dismiss it immediately.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-repository-documentation-for-the-task-completed-flash-integration-to-reflect-the-new-default-visibility-duration-1-minute-and-the-new-close-x-dismiss-behavior",
+      "title": "Update the repository documentation for the task-completed flash integration to reflect the new default visibility duration (1 minute) and the new close (X) dismiss behavior.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-study-zone-subject-creation-flow-so-authenticated-users-can-successfully-create-a-new-subject-and-see-it-appear-immediately-in-the-study-zone-subjects-list",
+      "title": "Fix the Study Zone subject creation flow so authenticated users can successfully create a new subject and see it appear immediately in the Study Zone subjects list.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-there-is-a-working-delete-option-for-completed-items-inside-study-zone-completed-assignments-so-a-user-can-remove-a-completed-assignment-from-a-subject",
+      "title": "Ensure there is a working delete option for completed items inside Study Zone (completed assignments) so a user can remove a completed assignment from a subject.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-in-app-customer-support-help-page-section-that-displays-the-provided-support-email-address-rohanchaudhari998-gmail-com",
+      "title": "Add an in-app Customer Support/Help page/section that displays the provided support email address: rohanchaudhari998@gmail.com.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-delete-control-for-each-work-zone-project-item-so-users-can-delete-any-item-completed-or-not-from-the-selected-project",
+      "title": "Add a delete control for each Work Zone project item so users can delete any item (completed or not) from the selected project.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-study-zone-frontend-to-show-a-delete-control-for-every-assignment-row-completed-or-not-and-wire-it-to-the-new-backend-assignment-delete-method-using-react-query-with-appropriate-loading-disabled-states-and-an-english-success-error-toast",
+      "title": "Update the Study Zone frontend to show a delete control for every assignment row (completed or not) and wire it to the new backend assignment delete method using React Query, with appropriate loading/disabled states and an English success/error toast.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -222,6 +364,82 @@
       "summary": "Add backend support for deleting tasks, with permissions enforced so a user can delete only their own tasks (admins may delete any task).",
       "reqIds": [
         "REQ-15"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Add a productivity dashboard to manage tasks and view productivity insights (overview of tasks, completion stats).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Add goal-setting on the dashboard (e.g., complete 5 of 10 tasks) and show completion percentage/progress.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Generate a daily productivity report in PDF format (at minimum for user to view/download).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Send the daily PDF productivity report to the user via email (daily email delivery).",
+      "reqIds": [],
+      "status": "blocked"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add backend support for storing per-user daily goal data and exposing query/update methods for the frontend to read and update goal settings.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add a Work Zone module for professional task management, including project organization, priority management, and progress tracking in a peaceful/distraction-free UI.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Add a Focus Mode timer feature that is only available/visible within Focus Mode.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Update the task-completed quote/message popup behavior: keep it visible for ~1 minute after completion and add a close (X) button to dismiss it immediately.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Add an in-app Customer Support/Help section/page that displays the provided support email address (no email-sending functionality).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Add a delete option for completed items within Study Zone (e.g., allow deleting completed assignments from a subject).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "In Work Zone and Study Zone, provide a delete option on every task/item (not only completed items).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-29",
+      "summary": "Implement backend support to delete any Study Zone assignment (not only completed ones) with proper per-user authorization, and ensure the assignment is removed from its subject’s assignments list.",
+      "reqIds": [
+        "REQ-38"
       ],
       "status": "pending"
     }

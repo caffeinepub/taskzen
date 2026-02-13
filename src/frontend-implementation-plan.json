@@ -1,155 +1,45 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Tasks: delete completed, reminders + notifications, Study Zone pages, and Focus Mode toggle",
+  "title": "Add delete controls for Work Zone items and Study Zone assignments",
   "requirements": [
     {
-      "id": "REQ-16",
-      "summary": "Add a delete control for completed tasks and refresh tasks after successful deletion",
+      "id": "REQ-37",
+      "summary": "Add a per-item delete (trash) control in Work Zone so users can remove any project item from the selected project via local UI state.",
       "acceptanceCriteria": [
-        "Each completed task row in the Completed section displays a visible delete control (button/icon) with an accessible label (e.g., \"Delete task\").",
-        "Deleting a completed task removes it from the UI after the backend call succeeds and the tasks query is refreshed/invalidated.",
-        "While deletion is in progress, the delete control is disabled and the UI communicates loading state.",
-        "Errors show a user-friendly toast/error message in English."
+        "On the Work Zone page, each project item row includes a visible delete (trash) button.",
+        "Clicking delete removes that item from the current project's items list immediately without affecting other items.",
+        "Delete works for both completed and active items.",
+        "The delete button has an accessible label/title (English), e.g., \"Delete task\"."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useTasks.ts",
+          "path": "frontend/src/pages/WorkZonePage.tsx",
           "operation": "modify",
-          "description": "Add a React Query mutation hook to delete a task via the backend capability (deleteTask), invalidate the ['tasks'] query on success, and show English toast messaging on success/failure. Use the shadcn-ui sonner toaster already wired in App.tsx for user-friendly errors. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/tasks/TaskList.tsx",
-          "operation": "modify",
-          "description": "In the Completed section, render a visible delete button/icon per completed task row with an accessible label (e.g., aria-label=\"Delete task\"). Disable the control and show a loading affordance while deletion is pending, and remove the row by relying on tasks query invalidation/refresh. Use shadcn-ui Button (and optionally a lucide icon) for consistent styling; do not modify files under frontend/src/components/ui. Verify the component's usage instructions before implementing."
+          "description": "Add a local-state delete handler (e.g., remove by projectId + itemId) and render a trash icon button on every project item row. Use the shadcn-ui Button component for consistent styling and accessibility (set aria-label/title to \"Delete task\"); verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-17",
-      "summary": "Provide UI to set/clear per-task reminder times and persist them using backend reminder capabilities",
+      "id": "REQ-39",
+      "summary": "Update Study Zone assignment rows to always show delete, and wire deletion to backend deleteAssignment via a React Query mutation with per-row pending UI and English toasts.",
       "acceptanceCriteria": [
-        "Backend task data supports an optional reminder time field per task and exposes methods to set/update/clear the reminder for a task id with owner/admin permission checks.",
-        "Frontend provides a way to set a reminder time for a task (at minimum from the Tasks page for an active task) and to clear an existing reminder.",
-        "Reminder changes persist after refresh (re-fetching tasks shows the saved reminder state).",
-        "If a user tries to set a reminder for a task they do not own (and is not admin), the backend denies it."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useTasks.ts",
-          "operation": "modify",
-          "description": "Add React Query mutation hooks for setting and clearing task reminders using backend capabilities (setTaskReminder, clearTaskReminder). On success, invalidate ['tasks']; on error, show English toast messaging. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/tasks/TaskList.tsx",
-          "operation": "modify",
-          "description": "Add reminder controls for active tasks: allow setting an optional reminder time and clearing an existing reminder. Display current reminder state in the active task row (e.g., formatted time or \"No reminder\"). Use shadcn-ui components (Button, Input, Popover/Dialog as needed) to collect a reminder time (e.g., datetime-local input) and to present clear/cancel actions. Ensure controls are disabled while mutations are pending and errors are surfaced in English. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/lib/reminders.ts",
-          "operation": "create",
-          "description": "Create small, reusable utilities for reminder time handling: converting between backend Time (bigint) and JS Date, formatting a reminder time for display, and validating user input before calling reminder mutations."
-        }
-      ]
-    },
-    {
-      "id": "REQ-18",
-      "summary": "Trigger in-app and browser notifications once when reminders become due while the app is open, with a permission request UI flow",
-      "acceptanceCriteria": [
-        "If Notification permission is not granted, the app provides a clear UI control to request permission (English copy).",
-        "When a task reminder is due and the app is open, the user receives an in-app notification (e.g., toast) containing the task title.",
-        "When Notification permission is granted, the app also triggers a browser notification for due reminders while the app is open.",
-        "The reminder notification is triggered only once per due event (no repeated spamming from re-renders)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useReminderNotifications.ts",
-          "operation": "create",
-          "description": "Implement a React hook that (a) derives due reminders from the current tasks list, (b) schedules checks/timeouts while the app is open, (c) triggers an in-app toast containing the task title, and (d) triggers a browser Notification when permission is granted. Ensure each due event fires only once (e.g., track fired reminder taskId+reminderTime in-memory and/or session storage) to prevent re-render spam."
-        },
-        {
-          "path": "frontend/src/components/notifications/NotificationPermissionPrompt.tsx",
-          "operation": "create",
-          "description": "Create a small UI component that explains notification permission in English and provides a clear control to request permission via the browser Notifications API. Use shadcn-ui components (e.g., Card/Alert/Button) for consistent styling. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/TasksPage.tsx",
-          "operation": "modify",
-          "description": "Wire reminder notifications into the Tasks page: render the notification permission prompt when permission is not granted/denied and activate the reminder notification hook when tasks data is available. Ensure this runs only for authenticated users and does not interfere with existing task functionality. Use the existing global toaster (sonner) for in-app notifications. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-19",
-      "summary": "Add Study Zone routed pages for subjects and assignments (create/list and basic assignment actions) and link them in navigation",
-      "acceptanceCriteria": [
-        "Backend exposes CRUD-style methods to: create/list subjects; create/list assignments for a subject; and (at minimum) mark an assignment completed or delete it, with owner/admin permission checks.",
-        "Frontend adds new routed pages for Study Zone (at minimum: Subjects list page, Subject detail page showing assignments, and forms to add a subject and add an assignment).",
-        "Study Zone pages are accessible from the app navigation (header) and use consistent styling with the existing TaskZen UI.",
-        "Subjects and assignments are scoped to the authenticated user (another user cannot view or mutate them)."
+        "In StudySubjectDetailPage, every assignment row shows a delete (trash) button (not limited to completed assignments).",
+        "Clicking delete removes the assignment after the mutation succeeds and the assignments list refreshes (React Query invalidation/refetch).",
+        "While delete is pending for an item, its delete button is disabled and shows a loading indicator consistent with existing UI patterns.",
+        "On success, an English toast confirms deletion; on error, an English toast displays a meaningful message (e.g., permission denied, not found).",
+        "No edits are made to any frontend immutablePaths files listed in SYSTEM_CONTEXT."
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useStudyZone.ts",
-          "operation": "create",
-          "description": "Create React Query hooks for Study Zone using backend capabilities: getSubjects, createSubject, getAssignments, addAssignment, completeAssignment (and any available delete/cleanup behavior exposed by the backend interface). Include loading/error handling with English toast messaging on mutations. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/StudySubjectsPage.tsx",
-          "operation": "create",
-          "description": "Create a protected Study Zone subjects list page that lists the user's subjects and includes a form to add a subject. Use shadcn-ui components (Card, Button, Input, Label, Alert) for consistent layout and validation messaging in English. Verify the component's usage instructions before implementing."
+          "operation": "modify",
+          "description": "Replace/retire the completed-only delete hook with a new React Query mutation hook that calls the backend deleteAssignment(subjectId, assignmentId), invalidates the subject-scoped assignments query key and any related cached data (subjects/tasks), and emits English success/error toasts. Keep error parsing consistent with existing patterns (e.g., Unauthorized/not found)."
         },
         {
           "path": "frontend/src/pages/StudySubjectDetailPage.tsx",
-          "operation": "create",
-          "description": "Create a protected subject detail page that shows assignments for a selected subject and includes a form to add an assignment (title and optional due date). Include an action to mark an assignment completed (and any minimal deletion action if supported/required) with optimistic/disabled UI while pending. Use shadcn-ui components for consistent styling. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/routeTree.tsx",
           "operation": "modify",
-          "description": "Register new routed pages for Study Zone under the authenticated AppLayout (e.g., /study for subjects list and /study/$subjectId for subject detail) so they are navigable and not orphaned."
-        },
-        {
-          "path": "frontend/src/components/layout/AppHeader.tsx",
-          "operation": "modify",
-          "description": "Add navigation links to Study Zone pages in the header (consistent with existing Home/Tasks/Add Task links). Use the existing shadcn-ui Button styling patterns and TanStack Router Link active-state handling. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-20",
-      "summary": "Add a Focus Mode page with an on/off toggle that influences reminder notification preference and uses a simplified layout",
-      "acceptanceCriteria": [
-        "A new Focus Mode route/page exists and is reachable from the app navigation.",
-        "The Focus Mode page includes a clear on/off control to enable/disable Focus Mode.",
-        "When Focus Mode is enabled and Notification permission is granted, due reminders trigger browser notifications (in addition to any in-app indication).",
-        "The Focus Mode page uses a visibly simplified/distraction-minimized layout (e.g., fewer controls, calmer presentation) without changing existing task functionality."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useFocusMode.ts",
-          "operation": "create",
-          "description": "Implement a small hook to store Focus Mode enabled/disabled state (e.g., localStorage-backed) and expose a setter for use across the app."
-        },
-        {
-          "path": "frontend/src/pages/FocusModePage.tsx",
-          "operation": "create",
-          "description": "Create a protected Focus Mode page with a clear on/off control (use shadcn-ui Switch/Button), English explanatory copy, and a distraction-minimized layout (simpler header content area, fewer controls). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useReminderNotifications.ts",
-          "operation": "modify",
-          "description": "Update reminder notification behavior to respect Focus Mode: when enabled and Notification permission is granted, prefer triggering browser notifications (while still providing an in-app indication). Ensure due events remain one-time. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/routeTree.tsx",
-          "operation": "modify",
-          "description": "Register a new Focus Mode route/page (e.g., /focus) under the authenticated AppLayout so it is reachable and not orphaned."
-        },
-        {
-          "path": "frontend/src/components/layout/AppHeader.tsx",
-          "operation": "modify",
-          "description": "Add a Focus Mode navigation link in the header to reach the Focus Mode page, matching existing navigation styling patterns. Verify the component's usage instructions before implementing."
+          "description": "Update imports to use the new delete-assignment hook, render a trash icon button for every assignment row (completed or not), and implement per-row pending UI (disable only the row being deleted and show a Loader2 spinner) with an accessible label/title like \"Delete assignment\". Use shadcn-ui Button for consistent UI; verify the component's usage instructions before implementing."
         }
       ]
     }

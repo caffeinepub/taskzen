@@ -17,7 +17,7 @@ export function useGetSubjects() {
 }
 
 export function useCreateSubject() {
-  const { actor } = useActor();
+  const { actor, isFetching: actorFetching } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -31,7 +31,20 @@ export function useCreateSubject() {
     },
     onError: (error: any) => {
       console.error('Failed to create subject:', error);
-      toast.error(error.message || 'Failed to create subject. Please try again.');
+      
+      // Parse backend authorization errors
+      let errorMessage = 'Failed to create subject. Please try again.';
+      if (error?.message) {
+        if (error.message.includes('Unauthorized')) {
+          errorMessage = 'You must be logged in to create subjects.';
+        } else if (error.message.includes('trap')) {
+          errorMessage = 'Authorization error. Please log in again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      toast.error(errorMessage);
     },
   });
 }
@@ -74,7 +87,17 @@ export function useAddAssignment() {
     },
     onError: (error: any) => {
       console.error('Failed to add assignment:', error);
-      toast.error(error.message || 'Failed to add assignment. Please try again.');
+      
+      let errorMessage = 'Failed to add assignment. Please try again.';
+      if (error?.message) {
+        if (error.message.includes('Unauthorized')) {
+          errorMessage = 'You do not have permission to add assignments to this subject.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      toast.error(errorMessage);
     },
   });
 }
@@ -86,16 +109,62 @@ export function useCompleteAssignment() {
   return useMutation({
     mutationFn: async (taskId: bigint) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.completeAssignment(taskId);
+      // Assignments are linked to tasks, so we complete the underlying task
+      return actor.completeTask(taskId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      queryClient.invalidateQueries({ queryKey: ['subjects'] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast.success('Assignment completed!');
     },
     onError: (error: any) => {
       console.error('Failed to complete assignment:', error);
-      toast.error(error.message || 'Failed to complete assignment. Please try again.');
+      
+      let errorMessage = 'Failed to complete assignment. Please try again.';
+      if (error?.message) {
+        if (error.message.includes('Unauthorized')) {
+          errorMessage = 'You do not have permission to complete this assignment.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      toast.error(errorMessage);
+    },
+  });
+}
+
+export function useDeleteAssignment() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ subjectId, assignmentId }: { subjectId: bigint; assignmentId: bigint }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.deleteAssignment(subjectId, assignmentId);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['assignments', variables.subjectId.toString()] });
+      queryClient.invalidateQueries({ queryKey: ['subjects'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast.success('Assignment deleted successfully!');
+    },
+    onError: (error: any) => {
+      console.error('Failed to delete assignment:', error);
+      
+      let errorMessage = 'Failed to delete assignment. Please try again.';
+      if (error?.message) {
+        if (error.message.includes('Unauthorized')) {
+          errorMessage = 'You do not have permission to delete this assignment.';
+        } else if (error.message.includes('not found')) {
+          errorMessage = 'Assignment not found.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      toast.error(errorMessage);
     },
   });
 }

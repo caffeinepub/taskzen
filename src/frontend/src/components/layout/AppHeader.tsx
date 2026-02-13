@@ -34,6 +34,20 @@ export default function AppHeader() {
                 </Button>
               )}
             </Link>
+            <Link to="/dashboard">
+              {({ isActive }) => (
+                <Button 
+                  variant={isActive ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "text-sm",
+                    isActive && "bg-secondary"
+                  )}
+                >
+                  Dashboard
+                </Button>
+              )}
+            </Link>
             <Link to="/tasks">
               {({ isActive }) => (
                 <Button 
@@ -62,14 +76,28 @@ export default function AppHeader() {
                 </Button>
               )}
             </Link>
-            <Link to="/study">
+            <Link to="/work">
               {({ isActive }) => (
                 <Button 
-                  variant={isActive || location.pathname.startsWith('/study') ? "secondary" : "ghost"}
+                  variant={isActive ? "secondary" : "ghost"}
                   size="sm"
                   className={cn(
                     "text-sm",
-                    (isActive || location.pathname.startsWith('/study')) && "bg-secondary"
+                    isActive && "bg-secondary"
+                  )}
+                >
+                  Work Zone
+                </Button>
+              )}
+            </Link>
+            <Link to="/study">
+              {({ isActive }) => (
+                <Button 
+                  variant={isActive ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "text-sm",
+                    isActive && "bg-secondary"
                   )}
                 >
                   Study Zone
@@ -87,6 +115,20 @@ export default function AppHeader() {
                   )}
                 >
                   Focus Mode
+                </Button>
+              )}
+            </Link>
+            <Link to="/support">
+              {({ isActive }) => (
+                <Button 
+                  variant={isActive ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "text-sm",
+                    isActive && "bg-secondary"
+                  )}
+                >
+                  Support
                 </Button>
               )}
             </Link>

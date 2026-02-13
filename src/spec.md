@@ -1,16 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Let users delete completed tasks, set task reminders with in-app/browser notifications, add a Study Zone for subjects/assignments, and use a Focus Mode that emphasizes notifications in a distraction-minimized view.
+**Goal:** Enable users to delete any Work Zone project item and any Study Zone assignment (completed or not), with proper backend authorization for Study Zone deletions.
 
 **Planned changes:**
-- Add backend task deletion by id with owner/admin permission enforcement and clear errors for missing/unauthorized deletes.
-- Update Tasks UI to show a delete control for completed tasks, including loading/disabled state and user-friendly error messaging.
-- Add backend support for an optional per-task reminder time, including set/update/clear methods with owner/admin permission checks.
-- Add Tasks UI controls to set/clear reminder times and persist reminder state across refresh.
-- Implement due-reminder notifications while the app is open: in-app notification and (when permitted) browser Notifications API, plus a UI flow to request notification permission.
-- Add a Study Zone module with backend persistence and per-user access control: subjects and assignments (create/list; and at minimum mark assignment completed or delete).
-- Add routed Study Zone pages (subjects list, subject detail with assignments, add-subject and add-assignment forms) and navigation entry.
-- Add a Focus Mode route/page with an on/off toggle; when enabled and permission is granted, due reminders prefer browser notifications, and the page uses a simplified/distraction-minimized layout.
+- Work Zone: add a per-item delete (trash) control on each project item row that removes the item from the currently selected project’s items list (local UI state).
+- Backend: add a method to delete a Study Zone assignment regardless of completion status with per-user authorization; ensure it is removed from the subject’s assignments list and delete any underlying linked Task (taskId) as part of the operation.
+- Study Zone frontend: show a per-assignment delete (trash) control on every assignment row and wire it to the new backend delete method via React Query, including per-item loading/disabled states and English success/error toasts.
 
-**User-visible outcome:** Users can remove completed tasks, set reminders and receive due notifications while the app is open, manage subjects and assignments in a Study Zone area, and enable Focus Mode to get clearer notification behavior in a calmer interface.
+**User-visible outcome:** Users can delete any Work Zone item from a project and delete any Study Zone assignment (completed or active) via a trash button, with immediate UI updates and clear English confirmation/error messages.

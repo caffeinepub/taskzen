@@ -1,101 +1,44 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T08:38:09.654Z",
+  "generatedAt": "2026-02-13T09:35:30.627Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 6,
-    "implemented": 5,
+    "total": 3,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-15",
-        "summary": "Add backend support for deleting tasks, with permissions enforced so a user can delete only their own tasks (admins may delete any task).",
+        "id": "REQ-37",
+        "summary": "Add a delete control for each Work Zone project item so users can delete any item (completed or not) from the selected project.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/WorkZonePage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/WorkZonePage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-38",
+        "summary": "Implement backend support to delete any Study Zone assignment (not only completed ones) with proper per-user authorization, and ensure the assignment is removed from its subject’s assignments list.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-16",
-        "summary": "Add a delete option in the Tasks UI for completed tasks so users can remove completed tasks from their list.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useTasks.ts",
-          "frontend/src/components/tasks/TaskList.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useTasks.ts",
-          "frontend/src/components/tasks/TaskList.tsx"
-        ]
-      },
-      {
-        "id": "REQ-17",
-        "summary": "Implement a task reminder feature that lets a user set/clear an optional reminder time for a task and persists it in the backend.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useTasks.ts",
-          "frontend/src/components/tasks/TaskList.tsx",
-          "frontend/src/lib/reminders.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useTasks.ts",
-          "frontend/src/components/tasks/TaskList.tsx",
-          "frontend/src/lib/reminders.ts"
-        ]
-      },
-      {
-        "id": "REQ-18",
-        "summary": "When a reminder becomes due while the app is open, notify the user in-app and (when permitted) via the browser Notifications API; provide a clear UI prompt/flow to request notification permission.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useReminderNotifications.ts",
-          "frontend/src/components/notifications/NotificationPermissionPrompt.tsx",
-          "frontend/src/pages/TasksPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useReminderNotifications.ts",
-          "frontend/src/components/notifications/NotificationPermissionPrompt.tsx",
-          "frontend/src/pages/TasksPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-19",
-        "summary": "Add a Study Zone module where users can create subjects and add assignments under each subject; persist all Study Zone data in the backend with per-user access control.",
+        "id": "REQ-39",
+        "summary": "Update the Study Zone frontend to show a delete control for every assignment row (completed or not) and wire it to the new backend assignment delete method using React Query, with appropriate loading/disabled states and an English success/error toast.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/hooks/useStudyZone.ts",
-          "frontend/src/pages/StudySubjectsPage.tsx",
-          "frontend/src/pages/StudySubjectDetailPage.tsx",
-          "frontend/src/routeTree.tsx",
-          "frontend/src/components/layout/AppHeader.tsx"
+          "frontend/src/pages/StudySubjectDetailPage.tsx"
         ],
         "matchedFiles": [
           "frontend/src/hooks/useStudyZone.ts",
-          "frontend/src/pages/StudySubjectsPage.tsx",
-          "frontend/src/pages/StudySubjectDetailPage.tsx",
-          "frontend/src/routeTree.tsx",
-          "frontend/src/components/layout/AppHeader.tsx"
-        ]
-      },
-      {
-        "id": "REQ-20",
-        "summary": "Add a Focus Mode page with a toggle that enables notification behavior while Focus Mode is active (i.e., reminders should prefer browser notifications when permission is granted) and presents a distraction-minimized UI.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useFocusMode.ts",
-          "frontend/src/pages/FocusModePage.tsx",
-          "frontend/src/hooks/useReminderNotifications.ts",
-          "frontend/src/routeTree.tsx",
-          "frontend/src/components/layout/AppHeader.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useFocusMode.ts",
-          "frontend/src/pages/FocusModePage.tsx",
-          "frontend/src/hooks/useReminderNotifications.ts",
-          "frontend/src/routeTree.tsx",
-          "frontend/src/components/layout/AppHeader.tsx"
+          "frontend/src/pages/StudySubjectDetailPage.tsx"
         ]
       }
     ]
@@ -109,21 +52,11 @@
     "frontend-implementation-plan.json",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/layout/AppHeader.tsx",
-    "frontend/src/components/notifications/NotificationPermissionPrompt.tsx",
-    "frontend/src/components/tasks/TaskList.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useFocusMode.ts",
-    "frontend/src/hooks/useReminderNotifications.ts",
     "frontend/src/hooks/useStudyZone.ts",
-    "frontend/src/hooks/useTasks.ts",
-    "frontend/src/lib/reminders.ts",
-    "frontend/src/pages/FocusModePage.tsx",
     "frontend/src/pages/StudySubjectDetailPage.tsx",
-    "frontend/src/pages/StudySubjectsPage.tsx",
-    "frontend/src/pages/TasksPage.tsx",
-    "frontend/src/routeTree.tsx",
+    "frontend/src/pages/WorkZonePage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

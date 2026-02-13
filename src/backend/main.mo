@@ -3,28 +3,109 @@ import Nat "mo:core/Nat";
 import Array "mo:core/Array";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-import Migration "migration";
-import Iter "mo:core/Iter";
 import Time "mo:core/Time";
+import Migration "migration";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-// Persistent actor state required for reminders and study zone as they MUST be preserved on canister upgrades
 (with migration = Migration.run)
 actor {
-  // Initialize the access control system
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // User Profile Type
   type UserProfile = {
     name : Text;
   };
 
-  let userProfiles = Map.empty<Principal, UserProfile>();
+  public type Task = {
+    id : Nat;
+    title : Text;
+    isCompleted : Bool;
+    owner : Principal;
+    reminderTime : ?Time.Time;
+  };
 
-  // User Profile Functions
+  public type Assignment = {
+    id : Nat;
+    taskId : Nat;
+    subjectId : Nat;
+    title : Text;
+    dueDate : ?Time.Time;
+    owner : Principal;
+  };
+
+  public type StudySubject = {
+    id : Nat;
+    title : Text;
+    assignments : [Assignment];
+    owner : Principal;
+  };
+
+  var tasks = Map.empty<Nat, Task>();
+  var studySubjects = Map.empty<Nat, StudySubject>();
+  var userProfiles = Map.empty<Principal, UserProfile>();
+  var dailyGoals = Map.empty<Principal, Nat>();
+
+  var nextTaskId : Nat = 0;
+  var nextSubjectId : Nat = 0;
+  var nextAssignmentId = 0;
+
+  public shared ({ caller }) func setDailyGoal(goal : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can set goals");
+    };
+    dailyGoals.add(caller, goal);
+  };
+
+  public query ({ caller }) func getDailyGoal(user : Principal) : async ?Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view goals");
+    };
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own goal");
+    };
+    dailyGoals.get(user);
+  };
+
+  public query ({ caller }) func getUserProgress(user : Principal) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can check progress");
+    };
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own progress");
+    };
+
+    let userTasks = tasks.values().toArray().filter(
+      func(task : Task) : Bool {
+        task.owner == user and task.isCompleted;
+      }
+    );
+    userTasks.size();
+  };
+
+  public query ({ caller }) func getProgressPercentage(user : Principal) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can check progress");
+    };
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own progress");
+    };
+
+    let completedTasks = tasks.values().toArray().filter(
+      func(task : Task) : Bool {
+        task.owner == user and task.isCompleted;
+      }
+    ).size();
+
+    let goal = switch (dailyGoals.get(user)) {
+      case (null) { 0 };
+      case (?goalVal) { goalVal };
+    };
+
+    if (goal == 0) { 0 } else { (completedTasks * 100) / goal };
+  };
+
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view profiles");
@@ -46,40 +127,6 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Task Management
-  // TaskId and SubjectId must be persistent to guarantee uniqueness on upgrades.
-  var nextTaskId : Nat = 0;
-  var nextSubjectId : Nat = 0;
-
-  public type Task = {
-    id : Nat;
-    title : Text;
-    isCompleted : Bool;
-    owner : Principal;
-    reminderTime : ?Time.Time;
-  };
-
-  public type StudySubject = {
-    id : Nat;
-    title : Text;
-    assignments : [Assignment];
-    owner : Principal;
-  };
-
-  public type Assignment = {
-    id : Nat;
-    taskId : Nat;
-    subjectId : Nat;
-    title : Text;
-    dueDate : ?Time.Time;
-    owner : Principal;
-  };
-
-  // Use persistent variables instead of closures to avoid migration issues and make the code explicit.
-  var tasks = Map.empty<Nat, Task>();
-  var studySubjects = Map.empty<Nat, StudySubject>();
-
-  // Task functions
   public shared ({ caller }) func addTask(title : Text) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can create tasks");
@@ -146,7 +193,7 @@ actor {
       tasks.values().toArray();
     } else {
       let filteredTasks = tasks.values().toArray().filter(
-        func(task) {
+        func(task : Task) : Bool {
           task.owner == caller;
         }
       );
@@ -154,7 +201,6 @@ actor {
     };
   };
 
-  // Task Reminder Functions
   public shared ({ caller }) func setTaskReminder(taskId : Nat, reminderTime : Time.Time) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can set reminders");
@@ -195,7 +241,6 @@ actor {
     };
   };
 
-  // Study Zone Functions
   public shared ({ caller }) func createSubject(title : Text) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can create subjects");
@@ -213,37 +258,36 @@ actor {
     subject.id;
   };
 
+  public shared ({ caller }) func deleteSubject(subjectId : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete subjects");
+    };
+
+    switch (studySubjects.get(subjectId)) {
+      case (null) {
+        Runtime.trap("Subject not found");
+      };
+      case (?subject) {
+        if (subject.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Can only delete your own subjects");
+        };
+        studySubjects.remove(subjectId);
+      };
+    };
+  };
+
   public query ({ caller }) func getSubjects() : async [StudySubject] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view subjects");
     };
-    
     if (AccessControl.isAdmin(accessControlState, caller)) {
       studySubjects.values().toArray();
     } else {
       studySubjects.values().toArray().filter(
-        func(subject) {
+        func(subject : StudySubject) : Bool {
           subject.owner == caller;
         }
       );
-    };
-  };
-
-  public shared ({ caller }) func completeAssignment(taskId : Nat) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can complete assignments");
-    };
-
-    let task = tasks.get(taskId);
-    switch (task) {
-      case (null) {
-        Runtime.trap("Task not found");
-      };
-      case (?task) {
-        if (task.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Can only complete your own assignments");
-        };
-      };
     };
   };
 
@@ -253,18 +297,16 @@ actor {
     };
 
     switch (studySubjects.get(subjectId)) {
-      case (null) { 
-        Runtime.trap("Subject not found");
-      };
+      case (null) { Runtime.trap("Subject not found") };
       case (?subject) {
         if (subject.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
           Runtime.trap("Unauthorized: Can only add assignments to your own subjects");
         };
-        
+
         let taskId = await addTask(title);
-        
+
         let assignment : Assignment = {
-          id = subject.assignments.size();
+          id = nextAssignmentId;
           taskId;
           subjectId;
           title;
@@ -274,16 +316,62 @@ actor {
         let updatedAssignments = subject.assignments.concat([assignment]);
         let updatedSubject = { subject with assignments = updatedAssignments };
         studySubjects.add(subjectId, updatedSubject);
+        nextAssignmentId += 1;
         ?assignment.id;
       };
     };
+  };
+
+  public shared ({ caller }) func deleteAssignment(subjectId : Nat, assignmentId : Nat) : async () {
+    // Check access rights - only authenticated users can delete assignments
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete assignments");
+    };
+
+    // Retrieve the subject
+    let subject = switch (studySubjects.get(subjectId)) {
+      case (null) {
+        Runtime.trap("Subject not found");
+      };
+      case (?subject) { subject };
+    };
+
+    // Find the assignment to verify ownership
+    let assignmentOpt = subject.assignments.find(
+      func(assignment : Assignment) : Bool {
+        assignment.id == assignmentId;
+      }
+    );
+
+    let assignment = switch (assignmentOpt) {
+      case (null) {
+        Runtime.trap("Assignment not found");
+      };
+      case (?a) { a };
+    };
+
+    // Authorization check: Only the assignment owner or an admin can delete it
+    if (assignment.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only delete your own assignments");
+    };
+
+    // Remove the assignment from the subject's assignment list
+    let updatedAssignments = subject.assignments.filter(
+      func(a : Assignment) : Bool {
+        a.id != assignmentId;
+      }
+    );
+
+    // Update the subject with the new assignments array
+    let updatedSubject = { subject with assignments = updatedAssignments };
+    studySubjects.add(subjectId, updatedSubject);
   };
 
   public query ({ caller }) func getAssignments(subjectId : Nat) : async ?[Assignment] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view assignments");
     };
-    
+
     switch (studySubjects.get(subjectId)) {
       case (null) { null };
       case (?subject) {
