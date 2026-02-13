@@ -1,0 +1,113 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-delete-option-in-the-tasks-ui-for-completed-tasks-so-users-can-remove-completed-tasks-from-their-list",
+      "featureTitle": "Add a delete option in the Tasks UI for completed tasks so users can remove completed tasks from their list.",
+      "files": [
+        "frontend/src/components/tasks/TaskList.tsx",
+        "frontend/src/hooks/useTasks.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-16"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-a-task-reminder-feature-that-lets-a-user-set-clear-an-optional-reminder-time-for-a-task-and-persists-it-in-the-backend",
+      "featureTitle": "Implement a task reminder feature that lets a user set/clear an optional reminder time for a task and persists it in the backend.",
+      "files": [
+        "frontend/src/components/tasks/TaskList.tsx",
+        "frontend/src/hooks/useTasks.ts",
+        "frontend/src/lib/reminders.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-17"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-when-a-reminder-becomes-due-while-the-app-is-open-notify-the-user-in-app-and-when-permitted-via-the-browser-notifications-api-provide-a-clear-ui-prompt-flow-to-request-notification-permission",
+      "featureTitle": "When a reminder becomes due while the app is open, notify the user in-app and (when permitted) via the browser Notifications API; provide a clear UI prompt/flow to request notification permission.",
+      "files": [
+        "frontend/src/components/notifications/NotificationPermissionPrompt.tsx",
+        "frontend/src/hooks/useReminderNotifications.ts",
+        "frontend/src/pages/TasksPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-18"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-study-zone-module-where-users-can-create-subjects-and-add-assignments-under-each-subject-persist-all-study-zone-data-in-the-backend-with-per-user-access-control",
+      "featureTitle": "Add a Study Zone module where users can create subjects and add assignments under each subject; persist all Study Zone data in the backend with per-user access control.",
+      "files": [
+        "frontend/src/components/layout/AppHeader.tsx",
+        "frontend/src/hooks/useStudyZone.ts",
+        "frontend/src/pages/StudySubjectDetailPage.tsx",
+        "frontend/src/pages/StudySubjectsPage.tsx",
+        "frontend/src/routeTree.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-19"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-focus-mode-page-with-a-toggle-that-enables-notification-behavior-while-focus-mode-is-active-i-e-reminders-should-prefer-browser-notifications-when-permission-is-granted-and-presents-a-distraction-minimized-ui",
+      "featureTitle": "Add a Focus Mode page with a toggle that enables notification behavior while Focus Mode is active (i.e., reminders should prefer browser notifications when permission is granted) and presents a distraction-minimized UI.",
+      "files": [
+        "frontend/src/components/layout/AppHeader.tsx",
+        "frontend/src/hooks/useFocusMode.ts",
+        "frontend/src/hooks/useReminderNotifications.ts",
+        "frontend/src/pages/FocusModePage.tsx",
+        "frontend/src/routeTree.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-20"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useActor } from './useActor';
+import type { StudySubject, Assignment } from '../backend';
+import { toast } from 'sonner';
+
+export function useGetSubjects() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<StudySubject[]>({
+    queryKey: ['subjects'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getSubjects();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useCreateSubject() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (title: string) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.createSubject(title);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subjects'] });
+      toast.success('Subject created successfully!');
+    },
+    onError: (error: any) => {
+      console.error('Failed to create subject:', error);
+      toast.error(error.message || 'Failed to create subject. Please try again.');
+    },
+  });
+}
+
+export function useGetAssignments(subjectId: bigint | null) {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<Assignment[] | null>({
+    queryKey: ['assignments', subjectId?.toString()],
+    queryFn: async () => {
+      if (!actor || !subjectId) return null;
+      return actor.getAssignments(subjectId);
+    },
+    enabled: !!actor && !actorFetching && subjectId !== null,
+  });
+}
+
+export function useAddAssignment() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      subjectId, 
+      title, 
+      dueDate 
+    }: { 
+      subjectId: bigint; 
+      title: string; 
+      dueDate: bigint | null;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.addAssignment(subjectId, title, dueDate);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['assignments', variables.subjectId.toString()] });
+      queryClient.invalidateQueries({ queryKey: ['subjects'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast.success('Assignment added successfully!');
+    },
+    onError: (error: any) => {
+      console.error('Failed to add assignment:', error);
+      toast.error(error.message || 'Failed to add assignment. Please try again.');
+    },
+  });
+}
+
+export function useCompleteAssignment() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (taskId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.completeAssignment(taskId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast.success('Assignment completed!');
+    },
+    onError: (error: any) => {
+      console.error('Failed to complete assignment:', error);
+      toast.error(error.message || 'Failed to complete assignment. Please try again.');
+    },
+  });
+}

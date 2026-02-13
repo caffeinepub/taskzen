@@ -1,0 +1,136 @@
+{
+  "kind": "build_request",
+  "title": "Add completed-task deletion, task reminders, Study Zone (subjects/assignments), and Focus Mode notifications",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-15",
+      "text": "Add backend support for deleting tasks, with permissions enforced so a user can delete only their own tasks (admins may delete any task).",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "plz add delete option after task complete"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A new backend method exists to delete a task by id.",
+        "If the task does not exist, the method returns an error (trap) with a clear message.",
+        "If the caller is not the task owner and not an admin, the method traps with an unauthorized error.",
+        "After deletion, the task no longer appears in getAllTasks results for the owner/admin."
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "text": "Add a delete option in the Tasks UI for completed tasks so users can remove completed tasks from their list.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "plz add delete option after task complete"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each completed task row in the Completed section displays a visible delete control (button/icon) with an accessible label (e.g., \"Delete task\").",
+        "Deleting a completed task removes it from the UI after the backend call succeeds and the tasks query is refreshed/invalidated.",
+        "While deletion is in progress, the delete control is disabled and the UI communicates loading state.",
+        "Errors show a user-friendly toast/error message in English."
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "text": "Implement a task reminder feature that lets a user set/clear an optional reminder time for a task and persists it in the backend.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "get remider option to reminder user"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend task data supports an optional reminder time field per task and exposes methods to set/update/clear the reminder for a task id with owner/admin permission checks.",
+        "Frontend provides a way to set a reminder time for a task (at minimum from the Tasks page for an active task) and to clear an existing reminder.",
+        "Reminder changes persist after refresh (re-fetching tasks shows the saved reminder state).",
+        "If a user tries to set a reminder for a task they do not own (and is not admin), the backend denies it."
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "text": "When a reminder becomes due while the app is open, notify the user in-app and (when permitted) via the browser Notifications API; provide a clear UI prompt/flow to request notification permission.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "get remider option to reminder user"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If Notification permission is not granted, the app provides a clear UI control to request permission (English copy).",
+        "When a task reminder is due and the app is open, the user receives an in-app notification (e.g., toast) containing the task title.",
+        "When Notification permission is granted, the app also triggers a browser notification for due reminders while the app is open.",
+        "The reminder notification is triggered only once per due event (no repeated spamming from re-renders)."
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "text": "Add a Study Zone module where users can create subjects and add assignments under each subject; persist all Study Zone data in the backend with per-user access control.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add diifernt study zone to add subject and add their assignment"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend exposes CRUD-style methods to: create/list subjects; create/list assignments for a subject; and (at minimum) mark an assignment completed or delete it, with owner/admin permission checks.",
+        "Frontend adds new routed pages for Study Zone (at minimum: Subjects list page, Subject detail page showing assignments, and forms to add a subject and add an assignment).",
+        "Study Zone pages are accessible from the app navigation (header) and use consistent styling with the existing TaskZen UI.",
+        "Subjects and assignments are scoped to the authenticated user (another user cannot view or mutate them)."
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "text": "Add a Focus Mode page with a toggle that enables notification behavior while Focus Mode is active (i.e., reminders should prefer browser notifications when permission is granted) and presents a distraction-minimized UI.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "add focus mode in focus mode enable notification"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A new Focus Mode route/page exists and is reachable from the app navigation.",
+        "The Focus Mode page includes a clear on/off control to enable/disable Focus Mode.",
+        "When Focus Mode is enabled and Notification permission is granted, due reminders trigger browser notifications (in addition to any in-app indication).",
+        "The Focus Mode page uses a visibly simplified/distraction-minimized layout (e.g., fewer controls, calmer presentation) without changing existing task functionality."
+      ]
+    }
+  ],
+  "constraints": [
+    "Respect the single-actor backend architecture: all Motoko logic must remain in backend/main.mo; add backend/migration.mo only if an upgrade-safe state migration is actually required.",
+    "Do not edit files under frontend/src/components/ui (read-only shadcn components); compose them instead.",
+    "Do not edit immutable hook entrypoints listed in SYSTEM_CONTEXT (frontend/src/hooks/useInternetIdentity.ts / .tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
+    "Use English for any new user-facing UI text."
+  ],
+  "nonGoals": [
+    "Implementing true push notifications when the app is closed (no service-worker push or external messaging providers).",
+    "Integrating third-party notification services (email/SMS/push providers) or external databases.",
+    "Adding real-time features (WebSockets) or multi-canister backend architecture."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

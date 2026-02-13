@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Completed Flash - Minimal Snippet</title>
+  
+  <!-- Step 1: Include the CSS -->
+  <link rel="stylesheet" href="task-completed-flash.css">
+</head>
+<body>
+  
+  <!-- Your website content here -->
+  <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+    <h1>Minimal Integration Example</h1>
+    <p>This shows the smallest possible integration.</p>
+    <button onclick="flash.trigger()" style="padding: 1rem 2rem; font-size: 1rem; cursor: pointer;">
+      Complete Task
+    </button>
+  </div>
+
+  <!-- Step 2: Include the JavaScript files -->
+  <script src="quotes.js"></script>
+  <script src="task-completed-flash.js"></script>
+  
+  <!-- Step 3: Initialize and use -->
+  <script>
+    // Create instance
+    const flash = new TaskCompletedFlash();
+    flash.init();
+    
+    // Trigger on your task completion event
+    // Example: flash.trigger();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,233 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 9,
+  "summary": "Expand TaskZen beyond basic task CRUD into additional productivity modules: task deletion after completion, reminder/notifications, a Study Zone for subjects/assignments, and a Focus Mode that can enable notifications.",
+  "architectural_notes": [
+    "Visual style: minimal, calm/devotional; soft saffron/white/cream palette; rounded cards; soft shadows; modern clean typography; clutter-free layout.",
+    "Move from single-page landing architecture to multi-page routing/navigation with separate views.",
+    "Add task creation flow (form + validation) and persistent task state (local storage or backend TBD).",
+    "Provide the task-completed animation as a framework-agnostic vanilla HTML/CSS/JS widget (no external libs) with an exported function/hook to trigger it from the app’s task-completed event.",
+    "Store the 100 Hindi inspirational quotes in a JS array exactly as provided; randomly select one per completion; show in centered popup with fade-in; auto-hide after 4 seconds.",
+    "Product scope now includes reminders/notifications and additional modules (Study Zone with subjects/assignments; Focus Mode notification behavior), beyond basic task list/add flows."
+  ],
+  "known_issues": [
+    "User reports inability to add tasks and that everything is on a single page; expects multi-page app behavior."
+  ],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-create-a-single-page-marketing-landing-page-for-a-to-do-list-app-named-taskzen-with-a-clean-minimal-calm-devotional-aesthetic-inspired-by-premanand-ji-maharaj-using-a-warm-palette-of-soft-saffron-white-and-cream-tones",
+      "title": "Create a single-page marketing landing page for a to-do list app named “TaskZen” with a clean, minimal, calm, devotional aesthetic inspired by Premanand Ji Maharaj, using a warm palette of soft saffron, white, and cream tones.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-required-landing-page-sections-in-order-1-hero-with-headline-taskzen-where-productivity-meets-peace-2-features-section-listing-work-zone-study-zone-daily-planner-focus-mode-gentle-reminders-cloud-sync-3-about-section-describing-how-the-app-blends-productivity-with-spiritual-calm-4-work-study-sections-showing-organized-task-categories-5-focus-mode-section-presenting-a-meditative-distraction-free-design-6-philosophy-section-containing-a-simple-spiritual-quote-about-clarity-and-focus-7-call-to-action-section-inviting-users-to-start-your-journey",
+      "title": "Implement the required landing page sections in order: (1) Hero with headline “TaskZen — Where Productivity Meets Peace”, (2) Features section listing: Work Zone, Study Zone, Daily Planner, Focus Mode, Gentle Reminders, Cloud Sync, (3) About section describing how the app blends productivity with spiritual calm, (4) Work & Study sections showing organized task categories, (5) Focus Mode section presenting a meditative, distraction-free design, (6) Philosophy section containing a simple spiritual quote about clarity and focus, (7) Call-to-Action section inviting users to “Start Your Journey”.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-use-rounded-cards-soft-shadows-warm-tones-and-a-user-friendly-layout-across-the-landing-page-ensure-consistent-component-styling-spacing-and-responsive-behavior-using-tailwind-css",
+      "title": "Use rounded cards, soft shadows, warm tones, and a user-friendly layout across the landing page; ensure consistent component styling, spacing, and responsive behavior using Tailwind CSS.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-establish-and-apply-one-coherent-visual-theme-system-color-tokens-type-scale-spacing-rhythm-button-styles-that-reinforces-a-peaceful-devotional-app-style-experience-without-adding-extra-product-features-beyond-the-landing-page",
+      "title": "Establish and apply one coherent visual theme system (color tokens, type scale, spacing rhythm, button styles) that reinforces a peaceful, devotional app-style experience without adding extra product features beyond the landing page.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-generated-static-visual-assets-that-match-the-page-s-calm-devotional-aesthetic-subtle-background-texture-and-a-simple-taskzen-mark-and-render-them-in-the-landing-page-from-the-frontend-s-public-static-assets-directory-frontend-public-assets-generated",
+      "title": "Add generated static visual assets that match the page’s calm devotional aesthetic (subtle background texture and a simple TaskZen mark) and render them in the landing page from the frontend’s public static assets directory (frontend/public/assets/generated).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refactor-the-frontend-from-a-single-page-only-landing-page-into-a-multi-page-app-experience-with-client-side-routing-so-core-areas-are-on-separate-pages-instead-of-one-long-page",
+      "title": "Refactor the frontend from a single-page-only landing page into a multi-page app experience with client-side routing, so core areas are on separate pages instead of one long page.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-core-task-creation-and-listing-ui-add-a-dedicated-page-view-to-create-a-task-and-a-separate-page-view-that-lists-tasks",
+      "title": "Implement core task creation and listing UI: add a dedicated page/view to create a task and a separate page/view that lists tasks.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-connect-the-new-tasks-add-task-pages-to-the-backend-using-the-existing-actor-query-setup-using-react-query-for-loading-and-mutation-states",
+      "title": "Connect the new Tasks/Add Task pages to the backend using the existing actor/query setup, using React Query for loading and mutation states.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-reusable-task-completed-flash-animation-ui-component-for-the-taskzen-react-app-that-triggers-when-a-task-is-successfully-marked-completed-showing-1-a-smooth-white-gold-flash-glow-effect-2-a-centered-quote-popup-3-fade-in-text-4-responsive-modern-clean-ui-and-5-auto-hide-after-4-seconds",
+      "title": "Implement a reusable “Task Completed Flash Animation” UI component for the TaskZen React app that triggers when a task is successfully marked completed, showing: (1) a smooth white-gold flash/glow effect, (2) a centered quote popup, (3) fade-in text, (4) responsive modern clean UI, and (5) auto-hide after 4 seconds.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-store-the-provided-hindi-inspirational-quotes-in-a-frontend-array-exactly-as-written-no-edits-to-punctuation-or-wording-and-randomly-select-exactly-one-quote-to-display-each-time-the-task-completed-animation-is-triggered",
+      "title": "Store the provided Hindi inspirational quotes in a frontend array exactly as written (no edits to punctuation or wording) and randomly select exactly ONE quote to display each time the task-completed animation is triggered.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-three-code-deliverables-inside-the-repo-for-the-task-completed-flash-animation-that-can-be-reused-outside-taskzen-without-external-libraries-1-a-full-standalone-html-css-js-example-2-a-reusable-component-style-version-vanilla-js-css-that-can-be-embedded-and-3-a-minimal-snippet-version-these-deliverables-must-not-depend-on-any-external-libraries",
+      "title": "Provide three code deliverables inside the repo for the “Task Completed Flash Animation” that can be reused outside TaskZen without external libraries: (1) a full standalone HTML+CSS+JS example, (2) a reusable component-style version (vanilla JS/CSS that can be embedded), and (3) a minimal snippet version. These deliverables must not depend on any external libraries.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-clear-in-repo-instructions-for-connecting-the-animation-to-a-task-completed-event-including-the-exact-integration-point-used-in-taskzen-when-completion-mutation-succeeds-and-a-generic-vanilla-js-example-for-other-websites",
+      "title": "Add clear in-repo instructions for connecting the animation to a “task completed” event, including the exact integration point used in TaskZen (when completion mutation succeeds) and a generic vanilla-JS example for other websites.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-landing-page-s-primary-feature-options-at-minimum-work-zone-study-zone-daily-planner-focus-mode-gentle-reminders-cloud-sync-touch-friendly-and-accessible-by-adding-clear-interactive-affordances-tap-click-feedback-keyboard-focus-styles-and-semantic-click-targets-without-changing-the-app-s-feature-scope",
+      "title": "Make the landing page’s primary feature options (at minimum: Work Zone, Study Zone, Daily Planner, Focus Mode, Gentle Reminders, Cloud Sync) touch-friendly and accessible by adding clear interactive affordances (tap/click feedback), keyboard focus styles, and semantic click targets without changing the app’s feature scope.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-delete-option-in-the-tasks-ui-for-completed-tasks-so-users-can-remove-completed-tasks-from-their-list",
+      "title": "Add a delete option in the Tasks UI for completed tasks so users can remove completed tasks from their list.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-task-reminder-feature-that-lets-a-user-set-clear-an-optional-reminder-time-for-a-task-and-persists-it-in-the-backend",
+      "title": "Implement a task reminder feature that lets a user set/clear an optional reminder time for a task and persists it in the backend.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-a-reminder-becomes-due-while-the-app-is-open-notify-the-user-in-app-and-when-permitted-via-the-browser-notifications-api-provide-a-clear-ui-prompt-flow-to-request-notification-permission",
+      "title": "When a reminder becomes due while the app is open, notify the user in-app and (when permitted) via the browser Notifications API; provide a clear UI prompt/flow to request notification permission.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-study-zone-module-where-users-can-create-subjects-and-add-assignments-under-each-subject-persist-all-study-zone-data-in-the-backend-with-per-user-access-control",
+      "title": "Add a Study Zone module where users can create subjects and add assignments under each subject; persist all Study Zone data in the backend with per-user access control.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-focus-mode-page-with-a-toggle-that-enables-notification-behavior-while-focus-mode-is-active-i-e-reminders-should-prefer-browser-notifications-when-permission-is-granted-and-presents-a-distraction-minimized-ui",
+      "title": "Add a Focus Mode page with a toggle that enables notification behavior while Focus Mode is active (i.e., reminders should prefer browser notifications when permission is granted) and presents a distraction-minimized UI.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-2",
+      "summary": "Implement core to-do functionality: allow users to add tasks (basic task creation UI + state handling).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Refactor from a single-page layout to a multi-page app experience with separate pages/views (e.g., tasks list, add task, other sections) using routing/navigation.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Add backend support for storing and retrieving tasks on the Internet Computer, so tasks persist and can be fetched by the frontend.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Add a reusable “Task Completed Flash Animation” UI component (vanilla HTML/CSS/JS, no libraries) that shows a smooth white-gold flash/glow, then a centered responsive quote popup with fade-in text; selects 1 random quote from a stored Hindi quotes array; auto-hides after 4 seconds; provide full page code + reusable component + snippet + instructions to hook into task-completed event.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Ensure all main TaskZen options/sections (e.g., Study Zone, Daily Planner) are interactive/touch-friendly (clickable/tappable) and behave as intended across devices.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Add a delete option after a task is completed (allow users to remove completed tasks).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add a reminder feature to remind users about tasks (reminder scheduling + user notifications).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Add a Study Zone module where users can add subjects and track assignments per subject.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Add Focus Mode behavior to enable notifications while in Focus Mode.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Add backend support for deleting tasks, with permissions enforced so a user can delete only their own tasks (admins may delete any task).",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "TaskZen",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

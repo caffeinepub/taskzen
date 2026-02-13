@@ -1,0 +1,76 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-13T08:38:09.651Z",
+  "summary": "Diff implements core pieces of task deletion, reminders with in-app/browser notifications, Study Zone pages/hooks, and a Focus Mode route with a persisted toggle. However, several acceptance criteria cannot be confirmed from the truncated backend diff, and reminder browser-notification behavior appears to be gated by Focus Mode (which conflicts with REQ-18’s requirement to notify via Notifications API whenever permission is granted).",
+  "missing_requirements": [
+    {
+      "id": "REQ-15",
+      "requirement": "Backend delete-task method must enforce owner/admin permissions, trap with clear unauthorized message, and deleted tasks must not appear in getAllTasks.",
+      "reason": "A deleteTask method is shown, but the ownership/admin check and post-delete behavior are truncated; getAllTasks behavior is not shown, so the full AC cannot be verified from the diff summary.",
+      "evidence": [
+        "backend/main.mo (deleteTask function truncated; getAllTasks not shown)"
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "requirement": "Completed task rows must show a visible delete control with an accessible label, disable it and communicate loading while deletion is in progress, and show user-friendly English error toasts.",
+      "reason": "TaskList is truncated. While hooks show toast error handling and the file summary mentions delete buttons for completed tasks, the diff summary does not provide evidence of an accessible label (e.g., aria-label), nor clear evidence the delete control is disabled and communicates loading state during mutation.",
+      "evidence": [
+        "frontend/src/components/tasks/TaskList.tsx (truncated)",
+        "frontend/src/hooks/useTasks.ts (toasts present, but UI disabled/loading not evidenced)"
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "requirement": "Backend must persist optional reminder time per task and expose set/update/clear reminder methods with owner/admin permission checks; frontend must be able to set and clear reminders and see them persist after refresh.",
+      "reason": "Backend Task type includes reminderTime and migration adds reminderTime=null for old tasks, but the backend methods (setTaskReminder/clearTaskReminder) and their permission checks are not shown in the truncated backend diff. Frontend calls actor.setTaskReminder/clearTaskReminder, but backend implementation cannot be verified from the diff summary.",
+      "evidence": [
+        "backend/main.mo (Task includes reminderTime; methods not shown)",
+        "backend/migration.mo (adds reminderTime field)",
+        "frontend/src/hooks/useTasks.ts (calls actor.setTaskReminder / actor.clearTaskReminder)"
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "requirement": "When Notification permission is granted, due reminders should also trigger a browser notification while the app is open (not only in Focus Mode).",
+      "reason": "useReminderNotifications triggers browser notifications only when Focus Mode is enabled AND permission is granted. REQ-18 requires browser notifications when permission is granted (Focus Mode is addressed separately in REQ-20, but REQ-18’s AC is not met as implemented).",
+      "evidence": [
+        "frontend/src/hooks/useReminderNotifications.ts (browser notification guarded by isFocusModeEnabled)"
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "requirement": "Backend must expose CRUD-style Study Zone methods (create/list subjects; create/list assignments; at minimum complete or delete assignment) with per-user access control; frontend must use these routes/pages from navigation.",
+      "reason": "Frontend routes/pages and hooks exist and navigation includes Study Zone, but backend Study Zone methods are not shown in the truncated backend diff (only types/state are visible). Also, frontend hook set does not show any assignment deletion method (only completeAssignment), and the StudySubjectDetailPage appears to delete via deleteTask rather than a dedicated deleteAssignment API, which doesn’t match the described Study Zone CRUD surface.",
+      "evidence": [
+        "backend/main.mo (types/state for studySubjects/Assignment shown; CRUD methods not shown)",
+        "frontend/src/hooks/useStudyZone.ts (getSubjects/createSubject/getAssignments/addAssignment/completeAssignment only)",
+        "frontend/src/pages/StudySubjectDetailPage.tsx (uses useDeleteTask for deleting an assignment task)",
+        "frontend/src/components/layout/AppHeader.tsx (Study Zone link)",
+        "frontend/src/routeTree.tsx (Study routes present)"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.66,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/layout/AppHeader.tsx",
+    "frontend/src/components/notifications/NotificationPermissionPrompt.tsx",
+    "frontend/src/components/tasks/TaskList.tsx",
+    "frontend/src/hooks/useFocusMode.ts",
+    "frontend/src/hooks/useReminderNotifications.ts",
+    "frontend/src/hooks/useStudyZone.ts",
+    "frontend/src/hooks/useTasks.ts",
+    "frontend/src/lib/reminders.ts",
+    "frontend/src/pages/FocusModePage.tsx",
+    "frontend/src/pages/StudySubjectDetailPage.tsx",
+    "frontend/src/pages/StudySubjectsPage.tsx",
+    "frontend/src/pages/TasksPage.tsx",
+    "frontend/src/routeTree.tsx",
+    "project_state.json"
+  ]
+}
